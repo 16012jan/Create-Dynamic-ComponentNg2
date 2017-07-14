@@ -1,7 +1,4 @@
-import {
-  Component, ComponentRef, ElementRef, EventEmitter, Host, Injector, OnInit, Output,
-  ViewContainerRef
-} from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {User} from '../shared/intefaces/user';
 import {Http} from '@angular/http';
 
@@ -13,7 +10,7 @@ import {Http} from '@angular/http';
 export class AuthFormComponent {
 
   public title = 'Login';
-  public componentLink: ComponentRef<AuthFormComponent>;
+  public componentId: string;
 
   @Output('destroy')
   destroy: EventEmitter<any> = new EventEmitter<any>();
@@ -27,6 +24,6 @@ export class AuthFormComponent {
   }
 
   public destroyComponent() {
-    // Send Some data to Parent
+    this.destroy.emit(this.componentId);
   }
 }

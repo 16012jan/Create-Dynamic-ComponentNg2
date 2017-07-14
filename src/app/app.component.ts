@@ -1,5 +1,4 @@
-import {Component, ComponentFactoryResolver, ComponentRef, ElementRef, Renderer2, ViewChild, ViewContainerRef
-} from '@angular/core';
+import {Component, ComponentFactoryResolver, ComponentRef, ViewChild, ViewContainerRef} from '@angular/core';
 
 import { AuthFormComponent } from './auth-form/auth-form.component'
 
@@ -9,35 +8,38 @@ import { AuthFormComponent } from './auth-form/auth-form.component'
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'app';
-
   public component: ComponentRef<AuthFormComponent>;
-  public components: Array<ComponentRef<any>> = [];
+  private index: number;
+  private componentIdsMap = new Map;
 
   @ViewChild('entry', { read: ViewContainerRef }) entry: ViewContainerRef;
 
   constructor(
     private resolver: ComponentFactoryResolver,
-    private ref: ElementRef,
-    private render: Renderer2
-  ) {}
+  ) {
+    this.index = 0;
+  }
 
   public createAuthForm() {
     const authFormFactory = this.resolver.resolveComponentFactory(AuthFormComponent);
     this.component = this.entry.createComponent(authFormFactory);
     this.component.instance.title = 'Create Account';
-    this.component.instance.destroy.subscribe((component) => {
-      this.destroyComponent(component);
-    });
-    this.components.push(this.component);
+    const id = `id ${this.index}`;
+    this.component.instance.componentId = id;
+    this.componentIdsMap.set(id, this.component);
+    this.index += 1;
+    this.component.instance.destroy.subscribe((componentId) => {
+      this.destroyComponent(componentId);
+    })
   }
 
-  public moveComponent() {
-    this.entry.move(this.component.hostView, 1);
-  }
-
-  public destroyComponent(component) {
-    // destroy component
+  public destroyComponent(componentId) {
+    const comp = this.componentIdsMap.get(componentId);
+    const indice = this.entry.indexOf(comp);
+    console.log(comp);
+    console.log(indice);
+    this.entry.remove(indice);
+    this.componentIdsMap.delete(componentId);
   }
 }
 
